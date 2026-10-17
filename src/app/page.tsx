@@ -158,8 +158,10 @@ export default function ExplorationGamePage() {
         // Draw / holster plasma rifle
         engineRef.current?.combat.toggleWeapon();
       } else if (e.code === 'KeyF') {
-        // Quick drone launch shortcut when on helipad
-        if (engineRef.current && !engineRef.current.drone.isActive && engineRef.current.controls.position.y >= 28) {
+        // In flight: fire twin heavy plasma cannons; on ground: launch drone
+        if (engineRef.current?.drone.isActive) {
+          engineRef.current.drone.fireCannon();
+        } else if (engineRef.current && engineRef.current.controls.position.y >= 28) {
           handleStartDroneFlightRef.current();
         }
       } else if (e.code === 'KeyH') {
@@ -179,11 +181,15 @@ export default function ExplorationGamePage() {
       }
     };
 
-    // Global Mouse Click for Shooting Doom Plasma Rifle
+    // Global Mouse Click for Shooting Doom Plasma Rifle & Drone Cannons
     const handleMouseDown = (e: MouseEvent) => {
       // Left click fires weapon when cursor is locked or canvas active
       if (e.button === 0 && document.pointerLockElement) {
-        engineRef.current?.combat.shoot();
+        if (engineRef.current?.drone.isActive) {
+          engineRef.current.drone.fireCannon();
+        } else {
+          engineRef.current?.combat.shoot();
+        }
       }
     };
 
@@ -367,6 +373,9 @@ export default function ExplorationGamePage() {
           }}
           onDroneYaw={(dir) => {
             engineRef.current?.drone.setYaw(dir);
+          }}
+          onDroneFire={() => {
+            engineRef.current?.drone.fireCannon();
           }}
           onDroneExit={() => {
             handleExitDroneFlight();

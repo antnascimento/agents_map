@@ -35,6 +35,7 @@ interface MobileTouchControlsProps {
   onDroneDescend?: (active: boolean) => void;
   onDroneTurbo?: (active: boolean) => void;
   onDroneYaw?: (direction: number) => void; // -1 left, 0 none, +1 right
+  onDroneFire?: () => void;
   onDroneExit?: () => void;
 }
 
@@ -56,6 +57,7 @@ export function MobileTouchControls({
   onDroneDescend,
   onDroneTurbo,
   onDroneYaw,
+  onDroneFire,
   onDroneExit,
 }: MobileTouchControlsProps) {
   // --- 1. VIRTUAL JOYSTICK STATE & HANDLERS ---
@@ -240,6 +242,19 @@ export function MobileTouchControls({
             >
               <Zap className="h-6 w-6 animate-pulse" />
               <span className="text-[8px] font-mono font-black">TURBO</span>
+            </button>
+
+            {/* R-Type Heavy Cannon Fire */}
+            <button
+              onPointerDown={(e) => {
+                e.stopPropagation();
+                onDroneFire && onDroneFire();
+              }}
+              className="h-14 w-14 rounded-2xl border-2 border-red-500 bg-red-600/90 flex flex-col items-center justify-center text-white active:scale-90 active:bg-red-400 shadow-[0_0_20px_rgba(239,68,68,0.8)] animate-pulse"
+              title="Fire Twin Plasma Cannons"
+            >
+              <Flame className="h-6 w-6 text-yellow-200" />
+              <span className="text-[8px] font-mono font-black">FIRE</span>
             </button>
           </div>
 

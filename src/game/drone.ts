@@ -1,10 +1,12 @@
 import * as THREE from 'three';
 import { DroneTelemetry } from './types';
+import { AerialCombatSystem } from './aerialCombat';
 
 export class DroneSystem {
   public mesh: THREE.Group;
   public launchPadMesh: THREE.Group;
   public isActive: boolean = false;
+  public combat: AerialCombatSystem;
 
   private camera: THREE.PerspectiveCamera;
   private domElement: HTMLElement;
@@ -72,6 +74,9 @@ export class DroneSystem {
     this.mesh.add(this.searchlight);
     this.searchlight.position.set(0, -0.2, 0);
 
+    // 4. R-Type 3D Aerial Combat System (Alien raider incursion fleet)
+    this.combat = new AerialCombatSystem(this.scene, this.camera);
+
     this.bindEvents();
   }
 
@@ -88,6 +93,34 @@ export class DroneSystem {
     const body = new THREE.Mesh(bodyGeo, bodyMat);
     body.castShadow = true;
     drone.add(body);
+
+    // R-Type Twin Heavy Plasma Blast Cannons
+    const cannonGeo = new THREE.CylinderGeometry(0.07, 0.07, 1.2, 8);
+    cannonGeo.rotateX(Math.PI / 2);
+    const cannonMat = new THREE.MeshStandardMaterial({
+      color: 0x0f172a,
+      metalness: 0.95,
+      roughness: 0.15,
+    });
+    const muzzleRingMat = new THREE.MeshBasicMaterial({ color: 0x00f3ff });
+
+    // Port Heavy Cannon
+    const cannonL = new THREE.Mesh(cannonGeo, cannonMat);
+    cannonL.position.set(-0.68, 0.04, -0.6);
+    drone.add(cannonL);
+
+    const muzzleL = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.015, 6, 16), muzzleRingMat);
+    muzzleL.position.set(-0.68, 0.04, -1.2);
+    drone.add(muzzleL);
+
+    // Starboard Heavy Cannon
+    const cannonR = new THREE.Mesh(cannonGeo, cannonMat);
+    cannonR.position.set(0.68, 0.04, -0.6);
+    drone.add(cannonR);
+
+    const muzzleR = new THREE.Mesh(new THREE.TorusGeometry(0.09, 0.015, 6, 16), muzzleRingMat);
+    muzzleR.position.set(0.68, 0.04, -1.2);
+    drone.add(muzzleR);
 
     // Upper Shell / Hood
     const shellGeo = new THREE.BoxGeometry(0.7, 0.16, 0.9);
@@ -218,6 +251,9 @@ export class DroneSystem {
       if (e.code === 'Space') this.keySpace = true;
       if (e.code === 'KeyC' || e.code === 'ControlLeft') this.keyCtrl = true;
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') this.keyShift = true;
+      if (e.code === 'KeyF') {
+        this.fireCannon();
+      }
       if (e.code === 'KeyR' || e.code === 'Escape') {
         this.exitFlight();
       }
@@ -236,6 +272,12 @@ export class DroneSystem {
       if (e.code === 'ShiftLeft' || e.code === 'ShiftRight') this.keyShift = false;
     });
 
+    window.addEventListener('mousedown', (e) => {
+      if (this.isActive && e.button === 0) {
+        this.fireCannon();
+      }
+    });
+
     document.addEventListener('pointerlockchange', () => {
       this.isPointerLocked = document.pointerLockElement === this.domElement;
     });
@@ -247,6 +289,14 @@ export class DroneSystem {
         this.rotation.x = Math.max(-0.6, Math.min(0.6, this.rotation.x - e.movementY * 0.002));
       }
     });
+  }
+
+  /**
+   * Pilot Fires R-Type Heavy Twin Plasma Cannons
+   */
+  public fireCannon() {
+    if (!this.isActive) return;
+    this.combat.fireDroneCannon(this.position, this.rotation);
   }
 
   // Mobile virtual joystick & button inputs
@@ -446,6 +496,9 @@ export class DroneSystem {
 
     const signalPct = Math.max(12, Math.round(100 - (distFromCenter / this.MAX_RADIUS) * 88));
 
+    // 5. Update R-Type Aerial Combat System
+    this.combat.update(dt, this.position, this.rotation);
+
     // Emit Flight Telemetry
     if (this.onTelemetry) {
       const speedKmh = Math.round(this.velocity.length() * 3.6);
@@ -464,6 +517,14 @@ export class DroneSystem {
         signalStrengthPct: signalPct,
         batteryPct: Math.round(this.batteryPct),
         isBoosting: this.keyShift,
+        hullHealth: this.combat.hullHealth,
+        maxHullHealth: this.combat.maxHullHealth,
+        activeShipsCount: this.combat.getActiveShipsCount(),
+        totalShipsCount: this.combat.totalShipsCount,
+        defeatedShipsCount: this.combat.defeatedShipsCount,
+        targetLocked: this.combat.targetLocked,
+        targetDistanceM: this.combat.targetDistanceM,
+        aerialScore: this.combat.score,
       });
     }
   }
@@ -472,5 +533,6 @@ export class DroneSystem {
     this.scene.remove(this.mesh);
     this.scene.remove(this.launchPadMesh);
     this.scene.remove(this.searchlightTarget);
+    this.combat.dispose();
   }
 }

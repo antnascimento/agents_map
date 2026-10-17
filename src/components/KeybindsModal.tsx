@@ -96,12 +96,12 @@ export function KeybindsModal({ isOpen, onClose }: KeybindsModalProps) {
             </div>
           </div>
 
-          <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 p-2.5">
+          <div className="flex items-center justify-between rounded-xl border border-cyan-500/40 bg-cyan-950/30 p-2.5">
             <div className="flex items-center gap-2 text-zinc-200">
-              <span className="text-zinc-300">Drone 1km Flight</span>
+              <span className="text-cyan-300 font-semibold">R-Type 3D Space Fighter Drone</span>
             </div>
             <div className="text-[10px] font-mono text-zinc-300">
-              <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-cyan-300 font-bold">SPACE</kbd> Climb • <kbd className="text-red-400 font-bold">R</kbd> Exit
+              <kbd className="text-yellow-300 font-bold">CLICK / F</kbd> Cannons • <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-emerald-300 font-bold">SHIFT</kbd> Turbo • <kbd className="text-red-400 font-bold">R</kbd> Exit
             </div>
           </div>
 

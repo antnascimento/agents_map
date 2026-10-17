@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { DroneTelemetry } from '../game/types';
-import { Plane, Compass, Wifi, Battery, Zap, RotateCcw, AlertTriangle } from 'lucide-react';
+import { Plane, Compass, Wifi, Battery, Zap, RotateCcw, AlertTriangle, Skull, Crosshair, Shield, Flame } from 'lucide-react';
 
 interface DroneHUDProps {
   telemetry: DroneTelemetry | null;
@@ -48,6 +48,24 @@ export function DroneHUD({ telemetry, onExitDrone, isMobile }: DroneHUDProps) {
             <div className="w-16 border-t border-dashed border-cyan-400/60 text-center font-bold">-20°</div>
           </div>
         </div>
+
+        {/* Tactical Crosshair Gunsight */}
+        <div className="absolute h-8 w-8 flex items-center justify-center pointer-events-none">
+          <div className="h-2 w-2 rounded-full border-2 border-cyan-400 shadow-[0_0_8px_#00f0ff]" />
+          <div className="absolute h-6 w-6 rounded-full border border-cyan-400/40" />
+        </div>
+
+        {/* Dynamic Target Locking Reticle on Enemy Alien Ship */}
+        {telemetry.targetLocked && (
+          <div className="absolute flex flex-col items-center pointer-events-none animate-pulse">
+            <div className="h-24 w-24 rounded-full border-2 border-red-500 border-dashed animate-spin flex items-center justify-center shadow-[0_0_20px_#ff0055]">
+              <div className="h-4 w-4 rounded-full border border-red-400 bg-red-500/40" />
+            </div>
+            <div className="mt-2 text-[10px] font-mono font-black text-red-300 bg-red-950/90 border border-red-500 px-2 py-0.5 rounded shadow">
+              TARGET LOCKED // {telemetry.targetDistanceM}M
+            </div>
+          </div>
+        )}
       </div>
 
       {/* 2. TOP FLIGHT STATUS BAR */}
@@ -55,8 +73,17 @@ export function DroneHUD({ telemetry, onExitDrone, isMobile }: DroneHUDProps) {
         <div className="flex items-center gap-2">
           <Plane className="h-4 w-4 text-cyan-400 animate-pulse" />
           <span className="font-mono text-xs font-black uppercase tracking-widest text-cyan-300">
-            APEX-1 RECON DRONE // AERIAL FLIGHT
+            APEX-R FIGHTER DRONE // R-TYPE CANNON
           </span>
+        </div>
+
+        <div className="h-4 w-[1px] bg-white/20" />
+
+        {/* Drone Hull Shield Bar */}
+        <div className="flex items-center gap-1.5 font-mono text-xs">
+          <Shield className="h-4 w-4 text-cyan-400" />
+          <span className="text-zinc-400">HULL:</span>
+          <span className="font-bold text-cyan-300">{Math.round(telemetry.hullHealth ?? 100)}%</span>
         </div>
 
         <div className="h-4 w-[1px] bg-white/20" />
@@ -94,6 +121,30 @@ export function DroneHUD({ telemetry, onExitDrone, isMobile }: DroneHUDProps) {
           <RotateCcw className="h-3.5 w-3.5" />
           <span>RETURN (R)</span>
         </button>
+      </div>
+
+      {/* R-TYPE AIR THREAT INCURSION FLEET COUNTER BADGE */}
+      <div className="pointer-events-auto absolute top-16 right-6 z-30">
+        <div className="flex items-center gap-2.5 rounded-2xl border-2 border-red-500/70 bg-black/85 px-4 py-2 backdrop-blur-xl shadow-[0_0_25px_rgba(239,68,68,0.5)]">
+          <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-600/30 border border-red-500 text-red-400 font-mono">
+            <Skull className="h-5 w-5 text-red-400 animate-pulse" />
+          </div>
+          <div>
+            <div className="text-[10px] uppercase font-mono font-bold tracking-widest text-red-400 flex items-center gap-1.5">
+              <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
+              AIR INCURSION FLEET
+            </div>
+            <div className="text-sm font-black font-mono text-white flex items-center gap-2">
+              <span className="text-red-400 text-base">{telemetry.activeShipsCount ?? 0}</span>
+              <span className="text-xs text-zinc-300">/ {telemetry.totalShipsCount ?? 0} SHIPS LEFT</span>
+              {(telemetry.defeatedShipsCount ?? 0) > 0 && (
+                <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                  +{telemetry.aerialScore ?? 0} PTS
+                </span>
+              )}
+            </div>
+          </div>
+        </div>
       </div>
 
       {/* 3. GEOFENCE WARNING (when near 1km boundary) */}
@@ -180,7 +231,7 @@ export function DroneHUD({ telemetry, onExitDrone, isMobile }: DroneHUDProps) {
 
           {/* 5. DRONE FLIGHT CONTROLS GUIDE (Bottom Center) */}
           <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-black/75 px-5 py-2 text-xs font-mono text-zinc-300 backdrop-blur-md shadow-2xl">
-            <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-cyan-300 font-bold">SPACE</kbd> Climb • <kbd className="text-cyan-300 font-bold">CTRL</kbd> Descend • <kbd className="text-emerald-300 font-bold">SHIFT</kbd> Turbo • <kbd className="text-red-400 font-bold">R</kbd> Exit
+            <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-cyan-300 font-bold">SPACE</kbd> Climb • <kbd className="text-cyan-300 font-bold">CTRL</kbd> Descend • <kbd className="text-emerald-300 font-bold">SHIFT</kbd> Turbo • <kbd className="text-yellow-300 font-bold">CLICK / F</kbd> Cannon (∞) • <kbd className="text-red-400 font-bold">R</kbd> Exit
           </div>
         </>
       )}

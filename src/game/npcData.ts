@@ -66,27 +66,27 @@ export const APEX_NPCS: NPCData[] = [
     badgeColor: '#38bdf8',
     position: [-8, 0, 6], // Near the West lounge & security gates
     rotationY: Math.PI / 4,
-    greeting: 'BEEP-CHIRP. Perimeter scan nominal. Ambient lumen levels: 85,000 lux. Visual clarity: 99.8%. Welcome, Commander.',
+    greeting: 'BEEP-CHIRP! ALERT, Commander! My long-range sensors detect hostile raider starships circling above the building! My subroutines are terrified! Please launch the Fighter Drone and clear the skies!',
     dialogueHistory: [
-      'BEEP-CHIRP. Perimeter scan nominal.',
-      'Ambient lumen levels: 85,000 lux. Visual clarity: 99.8%. Welcome, Commander.',
+      'BEEP-CHIRP! ALERT, Commander!',
+      'My long-range sensors detect hostile raider starships circling above the building! We good robots inside are terrified!',
     ],
     lore: 'Sentrix is an autonomous patrol android equipped with LIDAR guidance, repulsor hover stabilizers, and non-lethal acoustic dampening pulses.',
     options: [
       {
-        text: 'Status report on the ground perimeter.',
+        text: 'What are those ships flying over the building?',
         response:
-          'All access turnstiles calibrated. Natural sunlight penetration has eliminated all thermal and optical blindspots. Zero unauthorized incursions detected.',
+          'They are high-speed biomechanical raider ships cruising our open skies! We good robots inside are terrified they will bombard our glass complex! Commander, take the helipad drone, use its powerful twin cannons, and shoot them down!',
       },
       {
-        text: 'How do you like the bright daytime lighting?',
+        text: 'How can I stop the ships?',
         response:
-          'Optical sensors operating at peak thermodynamic efficiency. Solar recharging subroutines are drawing 14% extra auxiliary power from the sunbeams through the panoramic mullions.',
+          'Head up to Floor 5 Rooftop Helipad and press [F] to pilot the Apex-R Fighter Drone! It is armed with high-velocity R-Type plasma cannons! Target each alien ship in the open map and blast them!',
       },
       {
         text: 'Where are the elevator and stairs?',
         response:
-          'The East Wing stairwell core is at X: 14m, ascending to all 5 levels. Or you may activate your neural elevator transit pad directly via your HUD.',
+          'The East Wing stairwell core is at X: 14m, ascending to all 5 levels. Or you may activate your elevator transit pad directly via your HUD to reach the rooftop!',
       },
     ],
   },
@@ -136,27 +136,27 @@ export const APEX_NPCS: NPCData[] = [
     badgeColor: '#60a5fa',
     position: [-3, 6.0, -1], // Near the quantum cryo-chamber
     rotationY: Math.PI / 2,
-    greeting: '*WHIRRR-CLICK* Telemetry synchronization verified. Cryogenic containment integrity at 100.00%. Greetings, Commander.',
+    greeting: '*WHIRRR-TREMBLE* Emergency warning! Radar detects an alien raider armada flying directly above our lab! My servomotors are trembling with fear! Commander, activate the drone cannons!',
     dialogueHistory: [
-      '*WHIRRR-CLICK* Telemetry synchronization verified.',
-      'Cryogenic containment integrity at 100.00%. Greetings, Commander.',
+      '*WHIRRR-TREMBLE* Emergency warning!',
+      'Radar detects an alien raider armada flying directly above our lab! My servomotors are trembling with fear! Commander, please defend us!',
     ],
     lore: 'Cyber-Unit 7 is an ultra-high precision articulated cybernetic assistant capable of handling sub-micron crystalline lattices and laser alignments.',
     options: [
       {
-        text: 'Run laser calibration cycle.',
+        text: 'What are the sensor readings on the sky ships?',
         response:
-          '*ZAP-HUMMM* Optical interferometer aligned. Focal drift: 0.0003 picometers. Laser collimation optimal.',
+          '*SCREECH* Biomechanical alien warships cruising between 50m and 160m! Their plasma cannons can breach our glass ceiling at any second! Take the fighter drone from the roof and destroy them all!',
       },
       {
-        text: 'What do you think of Dr. Chen’s experiments?',
+        text: 'What weapons does our fighter drone have?',
         response:
-          'Processing... Dr. Chen exhibits 94.6% intellectual brilliance and 5.4% excessive caffeine dependency. I keep her coffee hot and her cryo-tanks cold.',
+          'We installed twin high-velocity R-Type plasma blast cannons! They punch through alien armor like paper. Click the mouse or press [F] in flight to fire!',
       },
       {
         text: 'Inspect server cluster telemetry.',
         response:
-          'Server banks 1 through 8 operating at nominal cryogenic cooling. 0 dropped packets. Data throughput: 400 Terabits/sec.',
+          'Cryo-containment holding, but sky electromagnetic interference is spiking! Eliminate those ships before our data lattice collapses!',
       },
     ],
   },

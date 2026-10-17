@@ -84,6 +84,16 @@ export interface DroneTelemetry {
   signalStrengthPct: number;
   batteryPct: number;
   isBoosting: boolean;
+  // R-Type 3D Fighter Aerial Combat
+  hullHealth: number;
+  maxHullHealth: number;
+  activeShipsCount: number;
+  totalShipsCount: number;
+  defeatedShipsCount: number;
+  targetLocked: boolean;
+  targetDistanceM?: number;
+  isFiring?: boolean;
+  aerialScore?: number;
 }
 
 export interface CombatTelemetry {

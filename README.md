@@ -39,16 +39,19 @@ An interactive 3D browser exploration game built with **Three.js (r169)**, **Nex
    * **420+ Instanced Trees**: Lush stylized foliage clusters rendered efficiently via `THREE.InstancedMesh`.
    * **Distant City Skyline**: 55+ glass skyscrapers and communication spires with flashing beacons.
 
-5. **Apex-1 Recon Drone (1km Aerial Flight Mode)**:
-   * Approach the rooftop helipad drone dock and press **`[F]`** (or touch "FLY DRONE") to take flight!
-   * Full 6-DOF aerodynamics: pitch forward/back, banking roll, yaw steering, vertical climb/descent, and **Turbo Boost up to 137 km/h**.
-   * Fly anywhere within a **1-kilometer (1000m)** radius of the building with comprehensive flight cockpit HUD.
+5. **Apex-R 3D Space Fighter Drone (R-Type Aerial Dogfighting)**:
+   * **Hostile Raider Fleet Incursion**: A random number of alien raider ships (between 8 and 15) cruising and swooping through the open sky ($45\text{m}$ to $180\text{m}$) directly over the Apex Nexus building.
+   * **Resident Robot Distress Lore**: The good robots inside the building (Sentrix, Cyber-Unit 7, Byte, Sprout, Nexus-9) are terrified of the menacing fleet overhead and radio the Commander to clear the airspace.
+   * **Powerful Twin Heavy Plasma Cannons**: Drone transformed into a 3D R-Type style space fighter armed with port & starboard heavy plasma blast cannons.
+   * **Aerial Dogfight Mechanics**: High-velocity cyan plasma bolts ($150\text{ m/s}$), dynamic target locking reticle with distance radar, alien ship return fire ($48\text{ m/s}$ crimson plasma), 3D floating health bars, and fiery aerial detonations with expanding shockwave rings.
+   * **Aerial Incursion Counter**: On-screen Drone HUD tracking remaining alien ships (`AIR INCURSION FLEET: X / [Total] SHIPS LEFT`) and aerial score.
+   * **Mobile Fighter Controls**: Virtual joystick flight with dedicated on-screen `[💥 FIRE]` button and `[TURBO]` boost.
 
 6. **10 Interactive Resident NPCs (Humans & Specialized Droids)**:
    * Approach within 3.5m of any character and press **`[E]`** to open an interactive dialogue modal with portraits, voice transcripts, and lore dossiers.
 
 7. **Procedural Web Audio Synthesizer**:
-   * Ambient generative soundtrack and full Doom combat sound design: player plasma blast, robot laser cannon, armor hit ricochet, robot explosion, player damage, and weapon equip sounds.
+   * Ambient generative soundtrack, Doom ground combat sounds, and full R-Type 3D space combat audio: twin plasma cannon blasts, alien ship laser fire, target lock beeps, and deep thunderous aerial explosions.
 
 8. **Live Multi-Agent Operations Monitor & Comms Transceiver**:
    * Real-time HUD widget showing what Agent Atlas, Agent Neo, Agent Iris, and Agent Scribe are doing.
@@ -79,6 +82,7 @@ An interactive 3D browser exploration game built with **Three.js (r169)**, **Nex
 | <kbd>W</kbd> / <kbd>S</kbd> | Pitch nose down (fly forward) / Pitch nose up (fly backward) |
 | <kbd>A</kbd> / <kbd>D</kbd> | Bank & Roll left / right |
 | <kbd>Q</kbd> / <kbd>E</kbd> | Yaw left / right |
+| <kbd>Left Click</kbd> / <kbd>F</kbd> | **Fire Twin Heavy Plasma Cannons (R-Type Cannon, Infinite Ammo)** |
 | <kbd>Space</kbd> | Throttle Up / Climb altitude |
 | <kbd>C</kbd> / <kbd>Ctrl</kbd> | Throttle Down / Descend toward terrain |
 | <kbd>Shift</kbd> | **TURBO BOOST** (up to $137\text{ km/h}$) |
