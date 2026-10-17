@@ -1,9 +1,17 @@
 # 🌆 Agents Map — 3D Multi-Agent Building & Aerial Drone Exploration
 
-An interactive 3D browser exploration game built with **Three.js**, **Next.js 14**, and **TypeScript**, designed in an autonomous agentic pair-programming workflow by three specialized AI agents:
+An interactive 3D browser exploration game built with **Three.js (r169)**, **Next.js 14**, and **TypeScript**, engineered in an autonomous multi-agent collaborative workflow by four specialized AI agents:
 * **Agent Atlas (World Architect)** — Structural building geometry, East Wing continuous switchback ramps, and exterior landscape.
 * **Agent Neo (Systems Engineer)** — Three.js rendering pipeline, 60 FPS physics tick, `<E>` NPC interaction raycasting, and 6-DOF drone aerodynamics.
 * **Agent Iris (Interior & Atmospheric Stylist)** — Daylight illumination, luxury PBR materials (Calacatta marble, honey-oak parquet), staged GLB lofts, and resident character lore.
+* **Agent Scribe (Technical Documentation & DevOps)** — Architecture specification, gameplay guide, release engineering, and repository deployment.
+
+---
+
+## 📚 Documentation Codex
+
+* **[ARCHITECTURE.md](file:///c:/Users/tman1/workplace/agents_chat/ARCHITECTURE.md)** — In-depth architectural breakdown: structural civil engineering, 6-DOF aerodynamic equations, 1200m terrain harmonics, procedural Web Audio node graph, and GLTF PBR pipeline.
+* **[GAMEPLAY_GUIDE.md](file:///c:/Users/tman1/workplace/agents_chat/GAMEPLAY_GUIDE.md)** — Comprehensive pilot handbook: complete ground and flight keybinds, floor secrets, NPC dossier guide, and terminal command directives.
 
 ---
 
@@ -31,6 +39,7 @@ An interactive 3D browser exploration game built with **Three.js**, **Next.js 14
 
 4. **10 Interactive Resident NPCs (Humans & Specialized Droids)**:
    * Approach within 3.5m of any character and press **`[E]`** to open an interactive dialogue modal with portraits, voice transcripts, and lore dossiers.
+   * Distributed 2 per floor across all 5 stories (Ava, Sentrix, Dr. Chen, Cyber-Unit 7, Marcus, Byte, Elena, Sprout, Captain Vance, and Nexus-9).
 
 5. **Generative Ambient Music Synthesizer (Web Audio API)**:
    * Breathing analog synth pads (*Cmaj7* $\to$ *Am7* $\to$ *Fmaj7* $\to$ *Dm7* $\to$ *Gsus4*) with dynamic lowpass filter modulation and crystalline pentatonic chimes.
@@ -38,8 +47,8 @@ An interactive 3D browser exploration game built with **Three.js**, **Next.js 14
    * HUD audio pill `[🎵 MUSIC: ON / OFF]` with animated equalizer bars.
 
 6. **Live Multi-Agent Operations Monitor & Comms Transceiver**:
-   * Real-time HUD widget showing what Agent Atlas, Agent Neo, and Agent Iris are doing.
-   * Interactive encrypted transceiver terminal to review agent dialogue and issue commander directives.
+   * Real-time HUD widget showing what Agent Atlas, Agent Neo, Agent Iris, and Agent Scribe are doing.
+   * Interactive encrypted transceiver terminal (<kbd>T</kbd>) to review agent dialogue and issue commander directives (`fly`, `drone`, `floor 1-5`, `helipad`).
 
 ---
 
@@ -95,15 +104,18 @@ Open [http://localhost:3000](http://localhost:3000) in your browser.
 
 ---
 
-## 📁 Project Architecture
+## 📁 Project Structure
 
 ```
 agents_map/
+├── ARCHITECTURE.md           # Deep architectural & mathematical specification
+├── GAMEPLAY_GUIDE.md         # Comprehensive controls & gameplay secrets guide
+├── README.md                 # Project overview & quick start
 ├── public/
 │   └── models/
-│       ├── free_loft_18.glb      # Executive & Penthouse luxury loft
-│       ├── interior_7.glb        # Sky garden terrace loft
-│       └── loft_16_interior.glb  # Grand atrium welcome lounge
+│       ├── free_loft_18.glb      # Executive & Penthouse luxury loft (12.3MB)
+│       ├── interior_7.glb        # Sky garden terrace loft (25.1MB)
+│       └── loft_16_interior.glb  # Grand atrium welcome lounge (3.5MB)
 ├── src/
 │   ├── app/
 │   │   ├── layout.tsx            # Root HTML metadata & dark theme
@@ -114,7 +126,7 @@ agents_map/
 │   │   ├── DroneHUD.tsx          # 6-DOF artificial horizon, airspeed, 1km geofence
 │   │   ├── ElevatorPanel.tsx     # Quick F1-F5 floor warp dock
 │   │   ├── NPCDialogueModal.tsx  # Character portrait dialogue & lore dossiers
-│   │   ├── CommsTransceiver.tsx  # Tripartite agent transmission terminal
+│   │   ├── CommsTransceiver.tsx  # Multi-agent transmission terminal & directives
 │   │   ├── AgentOperationsMonitor.tsx # Real-time agent status tracker
 │   │   └── KeybindsModal.tsx     # Interactive keyboard guide
 │   └── game/
