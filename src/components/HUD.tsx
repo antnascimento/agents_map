@@ -1,12 +1,13 @@
 'use client';
 
 import React, { useState } from 'react';
-import { PlayerTelemetry, NPCData } from '../game/types';
-import { Compass, Footprints, Shield, Eye, MessageSquare, Bot, User, Volume2, VolumeX, Music } from 'lucide-react';
+import { PlayerTelemetry, NPCData, CombatTelemetry } from '../game/types';
+import { Compass, Footprints, Shield, Eye, MessageSquare, Bot, User, Volume2, VolumeX, Music, Heart, Crosshair, Skull, Flame } from 'lucide-react';
 import { ambientAudio } from '../game/audio';
 
 interface HUDProps {
   telemetry: PlayerTelemetry | null;
+  combat?: CombatTelemetry | null;
   nearNPC?: NPCData | null;
   onInteractNPC?: () => void;
   onOpenHelp: () => void;
@@ -17,6 +18,7 @@ interface HUDProps {
 
 export function HUD({
   telemetry,
+  combat,
   nearNPC,
   onInteractNPC,
   onOpenHelp,
@@ -72,11 +74,38 @@ export function HUD({
         </div>
 
         {/* Tactical Vitals Strip (Condensed on mobile) */}
-        <div className="flex items-center gap-2 text-xs font-mono text-zinc-300">
+        <div className="flex flex-wrap items-center gap-2 text-xs font-mono text-zinc-300">
           <div className="flex items-center gap-1.5 rounded-xl border border-white/10 bg-black/55 px-2 py-1 backdrop-blur-sm text-[11px]">
             <span className="text-cyan-400 font-bold">ALT:</span>
             <span>{telemetry.position.y.toFixed(1)}m</span>
           </div>
+
+          {/* Combat Health & Shield Bars */}
+          {combat && (
+            <>
+              <div className="flex items-center gap-1.5 rounded-xl border border-red-500/40 bg-black/65 px-2.5 py-1 backdrop-blur-sm text-[11px]">
+                <Heart className="h-3.5 w-3.5 text-red-500 fill-red-500/30" />
+                <span className="text-red-400 font-bold">HP</span>
+                <span className="text-white font-bold">{Math.round(combat.health)}%</span>
+              </div>
+
+              <div className="flex items-center gap-1.5 rounded-xl border border-cyan-500/40 bg-black/65 px-2.5 py-1 backdrop-blur-sm text-[11px]">
+                <Shield className="h-3.5 w-3.5 text-cyan-400" />
+                <span className="text-cyan-400 font-bold">SHIELD</span>
+                <span className="text-white font-bold">{Math.round(combat.shield)}%</span>
+              </div>
+
+              {/* Weapon Drawn Status Indicator */}
+              <div className={`flex items-center gap-1.5 rounded-xl border px-2.5 py-1 backdrop-blur-sm text-[11px] font-bold ${
+                combat.isWeaponDrawn
+                  ? 'border-cyan-400 bg-cyan-950/80 text-cyan-200 shadow-[0_0_12px_rgba(0,240,255,0.4)]'
+                  : 'border-white/10 bg-black/55 text-zinc-400'
+              }`}>
+                <Crosshair className="h-3.5 w-3.5 text-cyan-300" />
+                <span>{combat.isWeaponDrawn ? '[G] PLASMA RIFLE (∞)' : '[G] HOLSTERED'}</span>
+              </div>
+            </>
+          )}
 
           {!isMobile && (
             <>
@@ -104,6 +133,37 @@ export function HUD({
           )}
         </div>
       </div>
+
+      {/* Top Center: Hostile Robots Remaining Doom Tracker */}
+      {combat && (
+        <div className="pointer-events-auto fixed top-4 left-1/2 -translate-x-1/2 z-20">
+          <div className="flex items-center gap-2.5 rounded-2xl border-2 border-red-500/70 bg-black/85 px-4 py-2 backdrop-blur-xl shadow-[0_0_25px_rgba(239,68,68,0.5)]">
+            <div className="flex h-8 w-8 items-center justify-center rounded-xl bg-red-600/30 border border-red-500/60 text-red-400 font-mono">
+              <Skull className="h-5 w-5 text-red-500 animate-pulse" />
+            </div>
+            <div>
+              <div className="text-[10px] uppercase font-mono font-bold tracking-widest text-red-400 flex items-center gap-1.5">
+                <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
+                HOSTILE COMBAT UNITS
+              </div>
+              <div className="text-sm font-black font-mono text-white flex items-center gap-2">
+                <span className="text-red-400 text-base">{combat.activeRobotsCount}</span>
+                <span className="text-xs text-zinc-300">/ {combat.totalRobotsCount} REMAINING</span>
+                {combat.defeatedRobotsCount > 0 && (
+                  <span className="text-[10px] font-bold text-emerald-400 bg-emerald-950/60 px-1.5 py-0.5 rounded border border-emerald-500/30">
+                    +{combat.score} PTS
+                  </span>
+                )}
+              </div>
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Fullscreen Red Damage Vignette Flash */}
+      {combat?.isDamageFlash && (
+        <div className="pointer-events-none fixed inset-0 z-50 bg-red-600/20 ring-8 ring-inset ring-red-600/70 transition-all duration-75" />
+      )}
 
       {/* Top Right: Agent Comms & Music Toggle */}
       <div className="pointer-events-auto fixed right-4 top-4 z-20 flex items-center gap-2">
@@ -199,7 +259,7 @@ export function HUD({
       {!isMobile && (
         <div className="pointer-events-none fixed bottom-4 left-1/2 -translate-x-1/2 z-20">
           <div className="rounded-full border border-white/10 bg-black/60 px-4 py-1.5 text-xs font-mono text-zinc-300 backdrop-blur-sm text-center shadow-lg">
-            Click screen to lock cursor • <kbd className="text-cyan-300 font-bold">W A S D</kbd> walk • <kbd className="text-cyan-300 font-bold">SHIFT</kbd> sprint • <kbd className="text-cyan-300 font-bold">SPACE</kbd> jump • <kbd className="text-cyan-300 font-bold">[E]</kbd> talk • <kbd className="text-cyan-300 font-bold">1-5</kbd> quick-warp
+            Click screen to lock cursor • <kbd className="text-cyan-300 font-bold">W A S D</kbd> walk • <kbd className="text-cyan-300 font-bold">SHIFT</kbd> sprint • <kbd className="text-cyan-300 font-bold">SPACE</kbd> jump • <kbd className="text-red-400 font-bold">[G]</kbd> gun • <kbd className="text-cyan-300 font-bold">CLICK</kbd> shoot (∞) • <kbd className="text-cyan-300 font-bold">[E]</kbd> talk
           </div>
         </div>
       )}

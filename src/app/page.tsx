@@ -2,7 +2,7 @@
 
 import React, { useEffect, useRef, useState, useCallback } from 'react';
 import { ThreeEngine } from '../game/engine';
-import { FloorLevel, PlayerTelemetry, NPCData, DroneTelemetry } from '../game/types';
+import { FloorLevel, PlayerTelemetry, NPCData, DroneTelemetry, CombatTelemetry } from '../game/types';
 import { HUD } from '../components/HUD';
 import { ElevatorPanel } from '../components/ElevatorPanel';
 import { CommsTransceiver } from '../components/CommsTransceiver';
@@ -32,6 +32,7 @@ export default function ExplorationGamePage() {
   }, []);
 
   const [telemetry, setTelemetry] = useState<PlayerTelemetry | null>(null);
+  const [combatTelemetry, setCombatTelemetry] = useState<CombatTelemetry | null>(null);
   const [nearNPC, setNearNPC] = useState<NPCData | null>(null);
   const [activeNPC, setActiveNPC] = useState<NPCData | null>(null);
 
@@ -128,6 +129,9 @@ export default function ExplorationGamePage() {
           lastDroneTelemetryTime.current = now;
           setDroneTelemetry(newDroneTelemetry);
         }
+      },
+      (newCombatTelemetry) => {
+        setCombatTelemetry(newCombatTelemetry);
       }
     );
 
@@ -150,6 +154,9 @@ export default function ExplorationGamePage() {
         } else if (nearNPCRef.current) {
           setActiveNPC(nearNPCRef.current);
         }
+      } else if (e.code === 'KeyG') {
+        // Draw / holster plasma rifle
+        engineRef.current?.combat.toggleWeapon();
       } else if (e.code === 'KeyF') {
         // Quick drone launch shortcut when on helipad
         if (engineRef.current && !engineRef.current.drone.isActive && engineRef.current.controls.position.y >= 28) {
@@ -172,10 +179,20 @@ export default function ExplorationGamePage() {
       }
     };
 
+    // Global Mouse Click for Shooting Doom Plasma Rifle
+    const handleMouseDown = (e: MouseEvent) => {
+      // Left click fires weapon when cursor is locked or canvas active
+      if (e.button === 0 && document.pointerLockElement) {
+        engineRef.current?.combat.shoot();
+      }
+    };
+
     window.addEventListener('keydown', handleKeyDown);
+    window.addEventListener('mousedown', handleMouseDown);
 
     return () => {
       window.removeEventListener('keydown', handleKeyDown);
+      window.removeEventListener('mousedown', handleMouseDown);
       engine.dispose();
       engineRef.current = null;
     };
@@ -234,6 +251,7 @@ export default function ExplorationGamePage() {
           {/* Tactical HUD Header & Badges */}
           <HUD
             telemetry={telemetry}
+            combat={combatTelemetry}
             nearNPC={nearNPC}
             onInteractNPC={() => {
               if (nearNPC) setActiveNPC(nearNPC);
@@ -302,6 +320,13 @@ export default function ExplorationGamePage() {
           isDroneFlight={isDroneFlight}
           nearNPC={nearNPC}
           onHelipad={!!(telemetry && telemetry.position.y >= 28)}
+          isWeaponDrawn={combatTelemetry?.isWeaponDrawn ?? false}
+          onToggleWeapon={() => {
+            engineRef.current?.combat.toggleWeapon();
+          }}
+          onShoot={() => {
+            engineRef.current?.combat.shoot();
+          }}
           onMove={(x, y) => {
             if (isDroneFlight) {
               engineRef.current?.drone.setJoystick(x, y);

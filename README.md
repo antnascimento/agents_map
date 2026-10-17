@@ -17,48 +17,53 @@ An interactive 3D browser exploration game built with **Three.js (r169)**, **Nex
 
 ## 🌟 Key Features
 
-1. **5-Story Architectural Complex ("The Apex Nexus")**:
-   * **Story 1 (Grand Atrium & Welcome Lounge)**: Calacatta marble with dark Nero borders, brass medallion, contemporary canvas art, and staged with `loft_16_interior.glb`.
-   * **Story 2 (Quantum & Cybernetics Lab)**: Reflective epoxy floor grid with illuminated sub-floor cable trenches, cryogenic quantum core, and server clusters.
-   * **Story 3 (Executive Strategy Suite)**: Staged with **`free_loft_18.glb`** featuring mezzanine stairs, designer kitchen, and mid-century modern lounge.
-   * **Story 4 (Botanical Sky Garden & Terrace)**: Biophilic green lawn, Japanese maple tree, cedar boardwalks, and staged with `interior_7.glb`.
-   * **Story 5 (Penthouse Command & Helipad)**: Semicircular master bridge console with wireframe tactical globe, luxury loft staging of `free_loft_18.glb`, and an outdoor rooftop landing deck with aviation hazard beacons.
+1. **Doom-Style FPS Combat & Hostile Red Robots**:
+   * **15 Hostile Red Combat Robots**: Spawned 3 per floor across stories 1 to 5. Features menacing crimson armor, glowing blood-red visors, dual arm blasters, and floating health bars.
+   * **Autonomous Robot AI**: Floor-bound patrol, line-of-sight alert, active pursuit towards player, and periodic red laser blaster fire ($24\text{ m/s}$ projectile speed, $15\text{ HP}$ damage).
+   * **Draw Weapon with <kbd>G</kbd>**: Smooth first-person draw/holster animation attaching a futuristic Doom plasma rifle model to the camera.
+   * **Left-Click Shooting (Infinite Ammo / Infinite Reload)**: High-speed cyan plasma bolts ($65\text{ m/s}$), instant hitscan raycasting, recoil recovery, and fiery spark explosions upon destroying enemy robots.
+   * **Tactical Robot Counter & Vitals HUD**: On-screen badge showing active hostile robots remaining (`ROBOTS REMAINING: X / 15`), player Health (HP) bar, Shield bar, and dynamic red damage flash vignette.
 
-2. **Slow Roads & Bottled-Inspired Exterior Vistas**:
+2. **Unified Brutalist Concrete Interior Model**:
+   * Staged with **`brutalist_concrete_interior_vr_room__pbr.glb`** across all 5 stories ($Y = 0.02, 6.02, 12.02, 18.02, 24.02\text{m}$).
+   * Single lightweight 3.58 MB PBR model cached in memory and instanced cleanly, delivering blistering 60–120 FPS performance with zero asset redundancy.
+
+3. **Mobile Phone Version & On-Screen Circle Button Pad**:
+   * Responsive layout detecting mobile devices and touch screens with optimized, uncluttered HUD.
+   * Smooth virtual thumbstick (circle joystick) for movement and touch-swipe look trackpad.
+   * Dedicated touch buttons for Jump, Sprint toggle, Warp elevator, NPC interact, Helipad drone launch, **Weapon Draw `[🔫 G]`**, and **`[💥 FIRE]`**.
+
+4. **Slow Roads & Bottled-Inspired Exterior Vistas**:
    * **1200m Rolling Green Hills & Meadows**: Sinusoidal procedural terrain extending to the horizon.
-   * **Scenic Highway with Active Traffic**: 18 smoothly animated vehicles (cars & buses) driving in both directions with illuminated headlights and taillights.
+   * **Scenic Highway with Active Traffic**: 18 smoothly animated vehicles with illuminated headlights and taillights.
    * **420+ Instanced Trees**: Lush stylized foliage clusters rendered efficiently via `THREE.InstancedMesh`.
    * **Distant City Skyline**: 55+ glass skyscrapers and communication spires with flashing beacons.
-   * **Drifting 3D Cumulus Clouds**: Low-poly cloud formations slowly crossing the azure daytime sky dome.
 
-3. **Apex-1 Recon Drone (1km Aerial Flight Mode)**:
-   * Approach the rooftop helipad drone dock and press **`[F]`** to take flight!
+5. **Apex-1 Recon Drone (1km Aerial Flight Mode)**:
+   * Approach the rooftop helipad drone dock and press **`[F]`** (or touch "FLY DRONE") to take flight!
    * Full 6-DOF aerodynamics: pitch forward/back, banking roll, yaw steering, vertical climb/descent, and **Turbo Boost up to 137 km/h**.
-   * Fly anywhere within a **1-kilometer (1000m)** radius of the building.
-   * Tactical Flight Cockpit HUD with Artificial Horizon, Pitch Ladder, Airspeed (km/h), AGL Altimeter, Geofence Radar, Signal Strength, and Battery monitor.
+   * Fly anywhere within a **1-kilometer (1000m)** radius of the building with comprehensive flight cockpit HUD.
 
-4. **10 Interactive Resident NPCs (Humans & Specialized Droids)**:
+6. **10 Interactive Resident NPCs (Humans & Specialized Droids)**:
    * Approach within 3.5m of any character and press **`[E]`** to open an interactive dialogue modal with portraits, voice transcripts, and lore dossiers.
-   * Distributed 2 per floor across all 5 stories (Ava, Sentrix, Dr. Chen, Cyber-Unit 7, Marcus, Byte, Elena, Sprout, Captain Vance, and Nexus-9).
 
-5. **Generative Ambient Music Synthesizer (Web Audio API)**:
-   * Breathing analog synth pads (*Cmaj7* $\to$ *Am7* $\to$ *Fmaj7* $\to$ *Dm7* $\to$ *Gsus4*) with dynamic lowpass filter modulation and crystalline pentatonic chimes.
-   * Zero external MP3 downloads; 100% offline and latency-free.
-   * HUD audio pill `[🎵 MUSIC: ON / OFF]` with animated equalizer bars.
+7. **Procedural Web Audio Synthesizer**:
+   * Ambient generative soundtrack and full Doom combat sound design: player plasma blast, robot laser cannon, armor hit ricochet, robot explosion, player damage, and weapon equip sounds.
 
-6. **Live Multi-Agent Operations Monitor & Comms Transceiver**:
+8. **Live Multi-Agent Operations Monitor & Comms Transceiver**:
    * Real-time HUD widget showing what Agent Atlas, Agent Neo, Agent Iris, and Agent Scribe are doing.
-   * Interactive encrypted transceiver terminal (<kbd>T</kbd>) to review agent dialogue and issue commander directives (`fly`, `drone`, `floor 1-5`, `helipad`).
 
 ---
 
 ## ⌨️ Controls & Keybindings
 
-### Character Exploration Mode
+### Character Exploration & Combat Mode
 | Key | Action |
 | :--- | :--- |
 | <kbd>W</kbd> <kbd>A</kbd> <kbd>S</kbd> <kbd>D</kbd> / <kbd>Arrows</kbd> | Move forward, backward, and strafe |
 | <kbd>Mouse</kbd> | Look / Rotate camera (Click canvas for PointerLock) |
+| <kbd>G</kbd> | **Draw / Holster Doom Plasma Rifle** |
+| <kbd>Left Click</kbd> | **Fire Plasma Weapon (Infinite Ammo & Infinite Reload)** |
 | <kbd>Shift</kbd> | Sprint boost ($8.5\text{ m/s}$) |
 | <kbd>Space</kbd> | Jump / Ascend ledge |
 | <kbd>C</kbd> / <kbd>Ctrl</kbd> | Crouch (lowers eye level to $1.0\text{m}$) |

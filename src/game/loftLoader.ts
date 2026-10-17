@@ -116,42 +116,51 @@ export class LoftManager {
   }
 
   /**
-   * Load all 3 user-provided GLB lofts onto designated floors
+   * Load brutalist concrete VR room PBR model across all floors of the building complex
    */
   public loadAllUserLofts(onAllComplete?: () => void) {
     let loadedCount = 0;
+    const modelUrl = '/models/brutalist_concrete_interior_vr_room__pbr.glb';
     const configs: LoftConfig[] = [
-      // 1. Story 3 (Executive Level): User's Favorite 'free_loft_18.glb'
+      // Story 1: Ground Atrium - Brutalist Entrance Vault
       {
-        url: '/models/free_loft_18.glb',
+        url: modelUrl,
+        floorLevel: 1,
+        baseY: 0.02,
+        offset: [-2, 0, 0],
+        rotationY: 0,
+      },
+      // Story 2: Cybernetics & Quantum Core - Concrete Laboratory
+      {
+        url: modelUrl,
+        floorLevel: 2,
+        baseY: 6.02,
+        offset: [-2, 0, 0],
+        rotationY: Math.PI / 2,
+      },
+      // Story 3: Strategy Deck - Brutalist Command Vault
+      {
+        url: modelUrl,
         floorLevel: 3,
         baseY: 12.02,
         offset: [-2, 0, 0],
-        rotationY: Math.PI, // Aligned with the East-West windows
+        rotationY: Math.PI,
       },
-      // 2. Story 5 (Penthouse Command Loft): User's Favorite 'free_loft_18.glb'
+      // Story 4: Sky Garden - Concrete Biome Chamber
       {
-        url: '/models/free_loft_18.glb',
+        url: modelUrl,
+        floorLevel: 4,
+        baseY: 18.02,
+        offset: [-2, 0, 0],
+        rotationY: -Math.PI / 2,
+      },
+      // Story 5: Penthouse Command - Brutalist Apex Bunker
+      {
+        url: modelUrl,
         floorLevel: 5,
         baseY: 24.02,
         offset: [-2, 0, 0],
         rotationY: 0,
-      },
-      // 3. Story 1 (Lobby / Welcome Loft): 'loft_16_interior.glb'
-      {
-        url: '/models/loft_16_interior.glb',
-        floorLevel: 1,
-        baseY: 0.02,
-        offset: [-5, 0, 0],
-        rotationY: Math.PI / 2,
-      },
-      // 4. Story 4 (Sky Garden / Terrace Loft): 'interior_7.glb'
-      {
-        url: '/models/interior_7.glb',
-        floorLevel: 4,
-        baseY: 18.02,
-        offset: [0, 0, 0],
-        rotationY: -Math.PI / 2,
       },
     ];
 

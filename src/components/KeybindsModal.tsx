@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { X, Keyboard, MousePointer, Move, Zap, ArrowUpCircle, MessageSquare } from 'lucide-react';
+import { X, Keyboard, MousePointer, Move, Zap, ArrowUpCircle, MessageSquare, Crosshair, Skull } from 'lucide-react';
 
 interface KeybindsModalProps {
   isOpen: boolean;
@@ -27,11 +27,32 @@ export function KeybindsModal({ isOpen, onClose }: KeybindsModalProps) {
           </div>
           <div>
             <h2 className="text-base font-bold font-mono text-white">CONTROLS & KEYBINDINGS</h2>
-            <p className="text-xs text-zinc-400">Tactical Exploration Matrix</p>
+            <p className="text-xs text-zinc-400">Tactical Exploration & Combat Matrix</p>
           </div>
         </div>
 
         <div className="space-y-2.5 font-mono text-xs">
+          {/* Doom Combat Controls */}
+          <div className="flex items-center justify-between rounded-xl border border-red-500/50 bg-red-950/30 p-2.5">
+            <div className="flex items-center gap-2 text-red-200">
+              <Crosshair className="h-4 w-4 text-red-400" />
+              <span className="font-bold text-red-300">Draw / Holster Weapon</span>
+            </div>
+            <div>
+              <kbd className="rounded border border-red-400/50 bg-red-950/80 px-2.5 py-1 text-red-300 font-bold">G</kbd>
+            </div>
+          </div>
+
+          <div className="flex items-center justify-between rounded-xl border border-red-500/40 bg-red-950/20 p-2.5">
+            <div className="flex items-center gap-2 text-zinc-200">
+              <Skull className="h-4 w-4 text-red-400" />
+              <span>Shoot Plasma Rifle (Infinite Ammo)</span>
+            </div>
+            <div>
+              <span className="rounded border border-red-400/40 bg-zinc-900 px-2.5 py-1 text-red-300 font-bold">Left Mouse Click</span>
+            </div>
+          </div>
+
           <div className="flex items-center justify-between rounded-xl border border-white/5 bg-white/5 p-2.5">
             <div className="flex items-center gap-2 text-zinc-200">
               <Move className="h-4 w-4 text-cyan-400" />

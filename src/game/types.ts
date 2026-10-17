@@ -85,3 +85,17 @@ export interface DroneTelemetry {
   batteryPct: number;
   isBoosting: boolean;
 }
+
+export interface CombatTelemetry {
+  health: number;
+  maxHealth: number;
+  shield: number;
+  maxShield: number;
+  isWeaponDrawn: boolean;
+  activeRobotsCount: number;
+  totalRobotsCount: number;
+  defeatedRobotsCount: number;
+  isGameOver: boolean;
+  isDamageFlash: boolean;
+  score: number;
+}

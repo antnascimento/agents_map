@@ -36,6 +36,9 @@ export class ExplorationControls {
   public joystickVector: THREE.Vector2 = new THREE.Vector2(0, 0);
   public mobileSprint: boolean = false;
 
+  // Current active floor
+  public currentFloor: FloorLevel = 1;
+
   // Telemetry callback
   public onTelemetry?: (telemetry: PlayerTelemetry) => void;
 
@@ -357,6 +360,7 @@ export class ExplorationControls {
       currentFloor = 5;
       floorName = this.position.y >= 30 ? 'Rooftop Helipad' : 'Story 5: Penthouse Command';
     }
+    this.currentFloor = currentFloor;
 
     // Calculate compass heading (0 = North, 90 = East, 180 = South, 270 = West)
     let degrees = ((-this.euler.y * 180) / Math.PI) % 360;

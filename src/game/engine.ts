@@ -1,11 +1,12 @@
 import * as THREE from 'three';
 import { build5StoryBuilding, BuildingData } from './building';
 import { ExplorationControls } from './controls';
-import { PlayerTelemetry, NPCData, DroneTelemetry } from './types';
+import { PlayerTelemetry, NPCData, DroneTelemetry, CombatTelemetry } from './types';
 import { NPCManager } from './npc';
 import { createExteriorWorld, ExteriorWorld } from './exteriorWorld';
 import { DroneSystem } from './drone';
 import { LoftManager } from './loftLoader';
+import { CombatSystem } from './combat';
 
 export class ThreeEngine {
   public scene: THREE.Scene;
@@ -17,6 +18,7 @@ export class ThreeEngine {
   public exteriorWorld: ExteriorWorld;
   public drone: DroneSystem;
   public loftManager: LoftManager;
+  public combat: CombatSystem;
 
   private clock: THREE.Clock;
   private animationFrameId: number | null = null;
@@ -26,7 +28,8 @@ export class ThreeEngine {
     container: HTMLElement,
     onTelemetry?: (telemetry: PlayerTelemetry) => void,
     onNearNPCChange?: (npc: NPCData | null) => void,
-    onDroneTelemetry?: (telemetry: DroneTelemetry) => void
+    onDroneTelemetry?: (telemetry: DroneTelemetry) => void,
+    onCombatTelemetry?: (telemetry: CombatTelemetry) => void
   ) {
     this.clock = new THREE.Clock();
 
@@ -74,11 +77,17 @@ export class ThreeEngine {
       this.drone.onTelemetry = onDroneTelemetry;
     }
 
-    // 9. Load User-Provided Architectural GLB Lofts (free_loft_18.glb, loft_16_interior.glb, interior_7.glb)
+    // 9. Load Brutalist Concrete VR Room GLB Interior across building
     this.loftManager = new LoftManager(this.scene);
     this.loftManager.loadAllUserLofts();
 
-    // 10. Controls
+    // 10. Doom-Style Combat System (Red robots, plasma gun, projectile physics)
+    this.combat = new CombatSystem(this.scene, this.camera);
+    if (onCombatTelemetry) {
+      this.combat.onCombatTelemetry = onCombatTelemetry;
+    }
+
+    // 11. Controls
     this.controls = new ExplorationControls(this.camera, this.renderer.domElement);
     this.controls.setColliders(
       this.building.floorColliders,
@@ -89,10 +98,10 @@ export class ThreeEngine {
       this.controls.onTelemetry = onTelemetry;
     }
 
-    // 11. Window resize listener
+    // 12. Window resize listener
     window.addEventListener('resize', this.onWindowResize);
 
-    // 12. Start Animation Loop
+    // 13. Start Animation Loop
     this.animate();
   }
 
@@ -163,6 +172,7 @@ export class ThreeEngine {
       this.controls.update(delta);
       this.drone.update(delta, elapsed); // Keep rotors idling and launch pad pulsing
       this.npcManager.update(this.controls.position, elapsed);
+      this.combat.update(delta, this.controls.position, this.controls.currentFloor);
     }
 
     // Update exterior world (highway cars, drifting clouds, water shimmer)
@@ -184,6 +194,7 @@ export class ThreeEngine {
     this.controls.dispose();
     this.drone.dispose();
     this.loftManager.dispose();
+    this.combat.dispose();
 
     if (this.renderer.domElement.parentElement) {
       this.renderer.domElement.parentElement.removeChild(this.renderer.domElement);

@@ -12,6 +12,8 @@ import {
   ArrowUp,
   ArrowDown,
   RotateCw,
+  Crosshair,
+  Flame,
 } from 'lucide-react';
 import { NPCData } from '../game/types';
 
@@ -19,6 +21,9 @@ interface MobileTouchControlsProps {
   isDroneFlight: boolean;
   nearNPC: NPCData | null;
   onHelipad: boolean;
+  isWeaponDrawn?: boolean;
+  onToggleWeapon?: () => void;
+  onShoot?: () => void;
   onMove: (x: number, y: number) => void;
   onLook: (deltaX: number, deltaY: number) => void;
   onJump?: () => void;
@@ -37,6 +42,9 @@ export function MobileTouchControls({
   isDroneFlight,
   nearNPC,
   onHelipad,
+  isWeaponDrawn = false,
+  onToggleWeapon,
+  onShoot,
   onMove,
   onLook,
   onJump,
@@ -299,6 +307,20 @@ export function MobileTouchControls({
               </button>
             )}
 
+            {/* Draw / Holster Weapon [G] */}
+            <button
+              onClick={onToggleWeapon}
+              className={`h-12 w-12 rounded-2xl border-2 flex flex-col items-center justify-center transition-all backdrop-blur-md shadow-md active:scale-95 ${
+                isWeaponDrawn
+                  ? 'border-red-400 bg-red-950/80 text-red-200 shadow-[0_0_15px_rgba(239,68,68,0.5)]'
+                  : 'border-white/20 bg-black/70 text-zinc-300 active:bg-white/20'
+              }`}
+              title="Toggle Weapon [G]"
+            >
+              <Crosshair className="h-5 w-5" />
+              <span className="text-[7px] font-mono font-black">{isWeaponDrawn ? 'GUN [G]' : 'DRAW [G]'}</span>
+            </button>
+
             {/* Quick Elevator Drawer Trigger */}
             <button
               onClick={onOpenElevator}
@@ -310,8 +332,23 @@ export function MobileTouchControls({
             </button>
           </div>
 
-          {/* Bottom row: Sprint Toggle & Jump */}
+          {/* Bottom row: Sprint Toggle, Jump, and Fire Button (when drawn) */}
           <div className="flex items-center gap-3">
+            {/* Fire Button (Only visible when weapon is drawn) */}
+            {isWeaponDrawn && (
+              <button
+                onPointerDown={(e) => {
+                  e.stopPropagation();
+                  onShoot && onShoot();
+                }}
+                className="h-16 w-16 rounded-3xl border-2 border-red-500 bg-red-600/90 text-white flex flex-col items-center justify-center active:scale-90 active:bg-red-400 shadow-[0_0_25px_rgba(239,68,68,0.8)] backdrop-blur-md animate-pulse"
+                title="Fire Plasma Weapon"
+              >
+                <Flame className="h-7 w-7 text-yellow-200" />
+                <span className="text-[9px] font-mono font-black tracking-wider">FIRE</span>
+              </button>
+            )}
+
             {/* Sprint Toggle */}
             <button
               onClick={toggleSprint}
