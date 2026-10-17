@@ -47,73 +47,6 @@ export default function ExplorationGamePage() {
     engineRef.current.exitDroneFlight();
   }, []);
 
-  // Initialize Three.js Engine
-  useEffect(() => {
-    if (!containerRef.current) return;
-
-    const engine = new ThreeEngine(
-      containerRef.current,
-      (newTelemetry) => {
-        setTelemetry({ ...newTelemetry });
-      },
-      (npc) => {
-        setNearNPC(npc);
-      },
-      (newDroneTelemetry) => {
-        setDroneTelemetry({ ...newDroneTelemetry });
-      }
-    );
-
-    engine.drone.onExit = () => {
-      setIsDroneFlight(false);
-    };
-
-    engineRef.current = engine;
-
-    // Global Key Listener
-    const handleKeyDown = (e: KeyboardEvent) => {
-      // Avoid triggering when user is typing in transceiver input
-      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
-        return;
-      }
-
-      if (e.code === 'KeyE') {
-        if (activeNPCRef.current) {
-          // If already in dialog, pressing E does not close immediately unless handled by modal
-        } else if (nearNPCRef.current) {
-          setActiveNPC(nearNPCRef.current);
-        }
-      } else if (e.code === 'KeyF') {
-        // Quick drone launch shortcut when on helipad
-        if (engineRef.current && !engineRef.current.drone.isActive && (telemetry?.position.y ?? 0) >= 28) {
-          handleStartDroneFlight();
-        }
-      } else if (e.code === 'KeyH') {
-        setIsHelpOpen((prev) => !prev);
-      } else if (e.code === 'KeyT') {
-        setIsCommsOpen((prev) => !prev);
-      } else if (e.code === 'Digit1') {
-        handleSelectFloor(1);
-      } else if (e.code === 'Digit2') {
-        handleSelectFloor(2);
-      } else if (e.code === 'Digit3') {
-        handleSelectFloor(3);
-      } else if (e.code === 'Digit4') {
-        handleSelectFloor(4);
-      } else if (e.code === 'Digit5') {
-        handleSelectFloor(5);
-      }
-    };
-
-    window.addEventListener('keydown', handleKeyDown);
-
-    return () => {
-      window.removeEventListener('keydown', handleKeyDown);
-      engine.dispose();
-      engineRef.current = null;
-    };
-  }, [handleStartDroneFlight, telemetry?.position.y]);
-
   // Floor quick-travel handler
   const handleSelectFloor = useCallback((level: FloorLevel) => {
     if (!engineRef.current) return;
@@ -145,6 +78,93 @@ export default function ExplorationGamePage() {
       }, 300);
     }, 200);
   }, []);
+
+  const handleSelectFloorRef = useRef(handleSelectFloor);
+  handleSelectFloorRef.current = handleSelectFloor;
+  const handleSelectRooftopRef = useRef(handleSelectRooftop);
+  handleSelectRooftopRef.current = handleSelectRooftop;
+  const handleStartDroneFlightRef = useRef(handleStartDroneFlight);
+  handleStartDroneFlightRef.current = handleStartDroneFlight;
+  const telemetryRef = useRef<PlayerTelemetry | null>(null);
+  const lastTelemetryTime = useRef(0);
+  const lastDroneTelemetryTime = useRef(0);
+
+  // Initialize Three.js Engine once on mount
+  useEffect(() => {
+    if (!containerRef.current) return;
+
+    const engine = new ThreeEngine(
+      containerRef.current,
+      (newTelemetry) => {
+        const now = performance.now();
+        // Throttle React state updates to 10 FPS (100ms) unless floor changes, keeping Three.js rendering at 60-120 FPS
+        if (now - lastTelemetryTime.current > 100 || telemetryRef.current?.currentFloor !== newTelemetry.currentFloor) {
+          lastTelemetryTime.current = now;
+          telemetryRef.current = newTelemetry;
+          setTelemetry(newTelemetry);
+        }
+      },
+      (npc) => {
+        setNearNPC(npc);
+      },
+      (newDroneTelemetry) => {
+        const now = performance.now();
+        if (now - lastDroneTelemetryTime.current > 100) {
+          lastDroneTelemetryTime.current = now;
+          setDroneTelemetry(newDroneTelemetry);
+        }
+      }
+    );
+
+    engine.drone.onExit = () => {
+      setIsDroneFlight(false);
+    };
+
+    engineRef.current = engine;
+
+    // Global Key Listener
+    const handleKeyDown = (e: KeyboardEvent) => {
+      // Avoid triggering when user is typing in transceiver input
+      if (e.target instanceof HTMLInputElement || e.target instanceof HTMLTextAreaElement) {
+        return;
+      }
+
+      if (e.code === 'KeyE') {
+        if (activeNPCRef.current) {
+          // In dialog
+        } else if (nearNPCRef.current) {
+          setActiveNPC(nearNPCRef.current);
+        }
+      } else if (e.code === 'KeyF') {
+        // Quick drone launch shortcut when on helipad
+        if (engineRef.current && !engineRef.current.drone.isActive && engineRef.current.controls.position.y >= 28) {
+          handleStartDroneFlightRef.current();
+        }
+      } else if (e.code === 'KeyH') {
+        setIsHelpOpen((prev) => !prev);
+      } else if (e.code === 'KeyT') {
+        setIsCommsOpen((prev) => !prev);
+      } else if (e.code === 'Digit1') {
+        handleSelectFloorRef.current(1);
+      } else if (e.code === 'Digit2') {
+        handleSelectFloorRef.current(2);
+      } else if (e.code === 'Digit3') {
+        handleSelectFloorRef.current(3);
+      } else if (e.code === 'Digit4') {
+        handleSelectFloorRef.current(4);
+      } else if (e.code === 'Digit5') {
+        handleSelectFloorRef.current(5);
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+      engine.dispose();
+      engineRef.current = null;
+    };
+  }, []); // Strictly empty dependency array so engine stays permanently alive
 
   // Handle commander commands sent through comms
   const handleCommanderCommand = useCallback((cmd: string) => {

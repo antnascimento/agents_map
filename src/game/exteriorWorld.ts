@@ -178,8 +178,19 @@ export function createExteriorWorld(): ExteriorWorld {
     });
   }
 
-  // 4. INSTANCED STYLIZED FOREST (Slow Roads Tree Clusters: 450+ Trees)
-  // Tree = Wooden Tapered Trunk + 3 Soft Fluffy Foliage Spheres
+  // Deterministic PRNG for stable, non-shifting procedural scatter
+  const seedRng = (seed: number) => {
+    let s = seed % 2147483647;
+    if (s <= 0) s += 2147483646;
+    return () => {
+      s = (s * 16807) % 2147483647;
+      return (s - 1) / 2147483646;
+    };
+  };
+  const rand = seedRng(982451653);
+
+  // 4. INSTANCED STYLIZED FOREST (Slow Roads Tree Clusters: 420+ Trees)
+  // Tree = Wooden Tapered Trunk + 2 Soft Fluffy Foliage Spheres
   const treeCount = 420;
   const trunkGeo = new THREE.CylinderGeometry(0.3, 0.55, 4.2, 7);
   const foliageGeo1 = new THREE.DodecahedronGeometry(2.2, 1);
@@ -188,23 +199,23 @@ export function createExteriorWorld(): ExteriorWorld {
   const trunkMat = new THREE.MeshStandardMaterial({ color: 0x5c4033, roughness: 0.9 });
   const foliageMat1 = new THREE.MeshStandardMaterial({ color: 0x488a38, roughness: 0.8, flatShading: true });
   const foliageMat2 = new THREE.MeshStandardMaterial({ color: 0x5fa846, roughness: 0.8, flatShading: true });
-  const foliageMat3 = new THREE.MeshStandardMaterial({ color: 0x3d7432, roughness: 0.8, flatShading: true });
 
   const instTrunks = new THREE.InstancedMesh(trunkGeo, trunkMat, treeCount);
   const instFoliage1 = new THREE.InstancedMesh(foliageGeo1, foliageMat1, treeCount);
   const instFoliage2 = new THREE.InstancedMesh(foliageGeo2, foliageMat2, treeCount);
 
-  instTrunks.castShadow = true;
-  instFoliage1.castShadow = true;
-  instFoliage2.castShadow = true;
+  // Performance: trees receive shadows from building/sun, but omit heavy instanced cast shadows
+  instTrunks.receiveShadow = true;
+  instFoliage1.receiveShadow = true;
+  instFoliage2.receiveShadow = true;
 
   const dummy = new THREE.Object3D();
   let validTreeIdx = 0;
 
-  // Scatter trees naturally on the hills and around the entrance avenue
-  for (let i = 0; i < treeCount * 1.5 && validTreeIdx < treeCount; i++) {
-    const angle = Math.random() * Math.PI * 2;
-    const rad = 32 + Math.random() * 450;
+  // Scatter trees deterministically on the hills and around the entrance avenue
+  for (let i = 0; i < treeCount * 2 && validTreeIdx < treeCount; i++) {
+    const angle = rand() * Math.PI * 2;
+    const rad = 32 + rand() * 450;
     const tx = Math.cos(angle) * rad;
     const tz = Math.sin(angle) * rad;
 
@@ -229,8 +240,8 @@ export function createExteriorWorld(): ExteriorWorld {
       ty = (h1 + h2 + h3) * blend;
     }
 
-    const scale = 0.75 + Math.random() * 0.7;
-    const rotY = Math.random() * Math.PI * 2;
+    const scale = 0.75 + rand() * 0.7;
+    const rotY = rand() * Math.PI * 2;
 
     // Trunk
     dummy.position.set(tx, ty + 2.1 * scale, tz);
@@ -240,12 +251,12 @@ export function createExteriorWorld(): ExteriorWorld {
     instTrunks.setMatrixAt(validTreeIdx, dummy.matrix);
 
     // Main Foliage Dome
-    dummy.position.set(tx, ty + (3.8 + Math.random() * 0.4) * scale, tz);
+    dummy.position.set(tx, ty + (3.8 + rand() * 0.4) * scale, tz);
     dummy.updateMatrix();
     instFoliage1.setMatrixAt(validTreeIdx, dummy.matrix);
 
     // Secondary Upper Foliage
-    dummy.position.set(tx + (Math.random() - 0.5) * 0.6, ty + 5.2 * scale, tz + (Math.random() - 0.5) * 0.6);
+    dummy.position.set(tx + (rand() - 0.5) * 0.6, ty + 5.2 * scale, tz + (rand() - 0.5) * 0.6);
     dummy.scale.set(scale * 0.8, scale * 0.8, scale * 0.8);
     dummy.updateMatrix();
     instFoliage2.setMatrixAt(validTreeIdx, dummy.matrix);

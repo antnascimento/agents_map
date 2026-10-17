@@ -46,7 +46,7 @@ export class ThreeEngine {
       powerPreference: 'high-performance',
     });
     this.renderer.setSize(width, height);
-    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+    this.renderer.setPixelRatio(Math.min(window.devicePixelRatio, 1.5));
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
     this.renderer.toneMappingExposure = 1.2;
     this.renderer.shadowMap.enabled = true;
@@ -102,12 +102,12 @@ export class ThreeEngine {
     hemiLight.position.set(0, 80, 0);
     this.scene.add(hemiLight);
 
-    // Warm Golden Sun with Soft Shadows
+    // Warm Golden Sun with Soft Shadows (Optimized 1024x1024 shadow map)
     const sunLight = new THREE.DirectionalLight(0xfff3d6, 2.1);
     sunLight.position.set(45, 75, 40);
     sunLight.castShadow = true;
-    sunLight.shadow.mapSize.width = 2048;
-    sunLight.shadow.mapSize.height = 2048;
+    sunLight.shadow.mapSize.width = 1024;
+    sunLight.shadow.mapSize.height = 1024;
     sunLight.shadow.camera.near = 10;
     sunLight.shadow.camera.far = 180;
     const d = 50;
