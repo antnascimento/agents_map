@@ -7,9 +7,10 @@ import { Plane, Compass, Wifi, Battery, Zap, RotateCcw, AlertTriangle } from 'lu
 interface DroneHUDProps {
   telemetry: DroneTelemetry | null;
   onExitDrone: () => void;
+  isMobile?: boolean;
 }
 
-export function DroneHUD({ telemetry, onExitDrone }: DroneHUDProps) {
+export function DroneHUD({ telemetry, onExitDrone, isMobile }: DroneHUDProps) {
   if (!telemetry) return null;
 
   const isNearBoundary = telemetry.distanceFromHelipadM > 880;
@@ -103,64 +104,86 @@ export function DroneHUD({ telemetry, onExitDrone }: DroneHUDProps) {
         </div>
       )}
 
-      {/* 4. SPEED & ALTITUDE DIALS (Bottom Left & Right) */}
-      {/* Left: Speedometer & Distance */}
-      <div className="absolute bottom-6 left-6 flex flex-col gap-2 font-mono text-xs">
-        <div className="rounded-2xl border border-cyan-500/30 bg-black/75 p-4 backdrop-blur-xl shadow-xl w-52">
-          <div className="text-[10px] uppercase tracking-wider text-cyan-400 font-bold mb-1 flex items-center justify-between">
-            <span>AIRSPEED</span>
-            {telemetry.isBoosting && (
-              <span className="flex items-center gap-1 text-emerald-400 animate-pulse text-[9px] bg-emerald-950/80 px-1 rounded border border-emerald-500/40">
-                <Zap className="h-3 w-3" /> TURBO
-              </span>
-            )}
+      {/* MOBILE COMPACT TELEMETRY STRIP */}
+      {isMobile && (
+        <div className="absolute top-16 left-1/2 -translate-x-1/2 flex items-center gap-2.5 rounded-xl border border-cyan-500/30 bg-black/80 px-3.5 py-1.5 font-mono text-[11px] text-white backdrop-blur-md shadow-lg z-20">
+          <div className="flex items-center gap-1 text-cyan-300 font-bold">
+            <Zap className="h-3 w-3 text-cyan-400" />
+            <span>{telemetry.speedKmh} km/h</span>
           </div>
-          <div className="text-3xl font-black text-white font-mono flex items-baseline gap-1.5">
-            {telemetry.speedKmh}
-            <span className="text-xs font-normal text-zinc-400">KM/H</span>
+          <div className="h-3 w-[1px] bg-white/20" />
+          <div className="text-amber-300 font-bold">
+            ALT: {telemetry.altitudeM}m
           </div>
-
-          <div className="mt-3 border-t border-white/10 pt-2 flex items-center justify-between text-[11px] text-zinc-300">
-            <span className="text-zinc-400">RADIUS:</span>
-            <span className="font-bold text-cyan-300">{telemetry.distanceFromHelipadM}m / 1000m</span>
-          </div>
-          {/* Progress bar to 1km */}
-          <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
-            <div
-              className={`h-full transition-all duration-150 ${
-                isNearBoundary ? 'bg-amber-400' : 'bg-cyan-400'
-              }`}
-              style={{ width: `${Math.min(100, (telemetry.distanceFromHelipadM / 1000) * 100)}%` }}
-            />
+          <div className="h-3 w-[1px] bg-white/20" />
+          <div className="text-zinc-300">
+            RAD: {telemetry.distanceFromHelipadM}m
           </div>
         </div>
-      </div>
+      )}
 
-      {/* Right: Altimeter & Heading */}
-      <div className="absolute bottom-6 right-6 flex flex-col gap-2 font-mono text-xs">
-        <div className="rounded-2xl border border-cyan-500/30 bg-black/75 p-4 backdrop-blur-xl shadow-xl w-52 text-right">
-          <div className="text-[10px] uppercase tracking-wider text-cyan-400 font-bold mb-1">
-            ALTITUDE (AGL)
-          </div>
-          <div className="text-3xl font-black text-white font-mono flex items-baseline justify-end gap-1.5">
-            {telemetry.altitudeM}
-            <span className="text-xs font-normal text-zinc-400">METERS</span>
+      {/* 4. DESKTOP SPEED & ALTITUDE DIALS (Bottom Left & Right - hidden on mobile) */}
+      {!isMobile && (
+        <>
+          {/* Left: Speedometer & Distance */}
+          <div className="absolute bottom-6 left-6 flex flex-col gap-2 font-mono text-xs">
+            <div className="rounded-2xl border border-cyan-500/30 bg-black/75 p-4 backdrop-blur-xl shadow-xl w-52">
+              <div className="text-[10px] uppercase tracking-wider text-cyan-400 font-bold mb-1 flex items-center justify-between">
+                <span>AIRSPEED</span>
+                {telemetry.isBoosting && (
+                  <span className="flex items-center gap-1 text-emerald-400 animate-pulse text-[9px] bg-emerald-950/80 px-1 rounded border border-emerald-500/40">
+                    <Zap className="h-3 w-3" /> TURBO
+                  </span>
+                )}
+              </div>
+              <div className="text-3xl font-black text-white font-mono flex items-baseline gap-1.5">
+                {telemetry.speedKmh}
+                <span className="text-xs font-normal text-zinc-400">KM/H</span>
+              </div>
+
+              <div className="mt-3 border-t border-white/10 pt-2 flex items-center justify-between text-[11px] text-zinc-300">
+                <span className="text-zinc-400">RADIUS:</span>
+                <span className="font-bold text-cyan-300">{telemetry.distanceFromHelipadM}m / 1000m</span>
+              </div>
+              {/* Progress bar to 1km */}
+              <div className="mt-1 h-1.5 w-full rounded-full bg-zinc-800 overflow-hidden">
+                <div
+                  className={`h-full transition-all duration-150 ${
+                    isNearBoundary ? 'bg-amber-400' : 'bg-cyan-400'
+                  }`}
+                  style={{ width: `${Math.min(100, (telemetry.distanceFromHelipadM / 1000) * 100)}%` }}
+                />
+              </div>
+            </div>
           </div>
 
-          <div className="mt-3 border-t border-white/10 pt-2 flex items-center justify-between text-[11px] text-zinc-300">
-            <span className="font-bold text-amber-300">{telemetry.headingDeg}°</span>
-            <span className="text-zinc-400 flex items-center gap-1">
-              <Compass className="h-3 w-3 text-amber-400" />
-              HEADING
-            </span>
-          </div>
-        </div>
-      </div>
+          {/* Right: Altimeter & Heading */}
+          <div className="absolute bottom-6 right-6 flex flex-col gap-2 font-mono text-xs">
+            <div className="rounded-2xl border border-cyan-500/30 bg-black/75 p-4 backdrop-blur-xl shadow-xl w-52 text-right">
+              <div className="text-[10px] uppercase tracking-wider text-cyan-400 font-bold mb-1">
+                ALTITUDE (AGL)
+              </div>
+              <div className="text-3xl font-black text-white font-mono flex items-baseline justify-end gap-1.5">
+                {telemetry.altitudeM}
+                <span className="text-xs font-normal text-zinc-400">METERS</span>
+              </div>
 
-      {/* 5. DRONE FLIGHT CONTROLS GUIDE (Bottom Center) */}
-      <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-black/75 px-5 py-2 text-xs font-mono text-zinc-300 backdrop-blur-md shadow-2xl">
-        <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-cyan-300 font-bold">SPACE</kbd> Climb • <kbd className="text-cyan-300 font-bold">CTRL</kbd> Descend • <kbd className="text-emerald-300 font-bold">SHIFT</kbd> Turbo • <kbd className="text-red-400 font-bold">R</kbd> Exit
-      </div>
+              <div className="mt-3 border-t border-white/10 pt-2 flex items-center justify-between text-[11px] text-zinc-300">
+                <span className="font-bold text-amber-300">{telemetry.headingDeg}°</span>
+                <span className="text-zinc-400 flex items-center gap-1">
+                  <Compass className="h-3 w-3 text-amber-400" />
+                  HEADING
+                </span>
+              </div>
+            </div>
+          </div>
+
+          {/* 5. DRONE FLIGHT CONTROLS GUIDE (Bottom Center) */}
+          <div className="absolute bottom-4 left-1/2 -translate-x-1/2 rounded-full border border-white/15 bg-black/75 px-5 py-2 text-xs font-mono text-zinc-300 backdrop-blur-md shadow-2xl">
+            <kbd className="text-cyan-300 font-bold">W/S</kbd> Pitch • <kbd className="text-cyan-300 font-bold">A/D</kbd> Roll • <kbd className="text-cyan-300 font-bold">Q/E</kbd> Yaw • <kbd className="text-cyan-300 font-bold">SPACE</kbd> Climb • <kbd className="text-cyan-300 font-bold">CTRL</kbd> Descend • <kbd className="text-emerald-300 font-bold">SHIFT</kbd> Turbo • <kbd className="text-red-400 font-bold">R</kbd> Exit
+          </div>
+        </>
+      )}
     </div>
   );
 }

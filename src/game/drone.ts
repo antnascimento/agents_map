@@ -249,12 +249,49 @@ export class DroneSystem {
     });
   }
 
+  // Mobile virtual joystick & button inputs
+  public joystickVector: THREE.Vector2 = new THREE.Vector2(0, 0);
+  public mobileAscend: boolean = false;
+  public mobileDescend: boolean = false;
+  public mobileTurbo: boolean = false;
+  public mobileYaw: number = 0; // -1 to rotate left, +1 to rotate right
+
+  public setJoystick(x: number, y: number) {
+    this.joystickVector.set(x, y);
+  }
+
+  public setAltitude(ascend: boolean, descend: boolean) {
+    this.mobileAscend = ascend;
+    this.mobileDescend = descend;
+  }
+
+  public setTurbo(turbo: boolean) {
+    this.mobileTurbo = turbo;
+  }
+
+  public setYaw(yaw: number) {
+    this.mobileYaw = yaw;
+  }
+
+  public applyLookDelta(deltaX: number, deltaY: number) {
+    this.rotation.y -= deltaX * 0.0035;
+    this.rotation.x = Math.max(-0.6, Math.min(0.6, this.rotation.x - deltaY * 0.003));
+  }
+
   public startFlight() {
     this.isActive = true;
     this.position.set(0, 32.5, 5); // Lift off 2m above helipad
     this.velocity.set(0, 0, 0);
     this.rotation.set(0, Math.PI, 0); // Face South outward over the hills
-    this.domElement.requestPointerLock?.();
+
+    if (!('ontouchstart' in window || navigator.maxTouchPoints > 0)) {
+      try {
+        const promise = this.domElement.requestPointerLock?.();
+        if (promise && typeof (promise as any).catch === 'function') {
+          (promise as any).catch(() => {});
+        }
+      } catch (_) {}
+    }
   }
 
   public exitFlight() {
@@ -266,6 +303,13 @@ export class DroneSystem {
     this.keySpace = false;
     this.keyCtrl = false;
     this.keyShift = false;
+
+    // Reset mobile states
+    this.mobileAscend = false;
+    this.mobileDescend = false;
+    this.mobileTurbo = false;
+    this.mobileYaw = 0;
+    this.joystickVector.set(0, 0);
 
     // Reset drone back to resting dock on helipad
     this.position.copy(this.HELIPAD_ORIGIN);
@@ -297,8 +341,9 @@ export class DroneSystem {
     const dt = Math.min(delta, 0.1);
 
     // 1. Aerodynamic Thruster Flight Model
-    const maxSpeed = this.keyShift ? 38.0 : 18.0; // Turbo boost up to 38 m/s (~137 km/h)
-    const acceleration = this.keyShift ? 45.0 : 25.0;
+    const isTurbo = this.keyShift || this.mobileTurbo;
+    const maxSpeed = isTurbo ? 38.0 : 18.0; // Turbo boost up to 38 m/s (~137 km/h)
+    const acceleration = isTurbo ? 45.0 : 25.0;
     const climbSpeed = 16.0;
 
     // Forward / Backward & Strafe directions relative to current drone Yaw
@@ -311,6 +356,12 @@ export class DroneSystem {
     if (this.keyD) inputDir.add(right);
     if (this.keyA) inputDir.sub(right);
 
+    // Apply mobile virtual joystick input (x: strafe, y: pitch forward/back)
+    if (this.joystickVector.lengthSq() > 0.001) {
+      inputDir.addScaledVector(forward, this.joystickVector.y);
+      inputDir.addScaledVector(right, this.joystickVector.x);
+    }
+
     if (inputDir.lengthSq() > 0) {
       inputDir.normalize();
       this.velocity.x += inputDir.x * acceleration * dt;
@@ -318,18 +369,18 @@ export class DroneSystem {
     }
 
     // Vertical climb / descent
-    if (this.keySpace) {
+    if (this.keySpace || this.mobileAscend) {
       this.velocity.y += climbSpeed * 2.2 * dt;
-    } else if (this.keyCtrl) {
+    } else if (this.keyCtrl || this.mobileDescend) {
       this.velocity.y -= climbSpeed * 2.2 * dt;
     } else {
       // Hover stabilization
       this.velocity.y = THREE.MathUtils.lerp(this.velocity.y, 0, dt * 5);
     }
 
-    // Yaw rotation from Q / E
-    if (this.keyQ) this.rotation.y += 1.8 * dt;
-    if (this.keyE) this.rotation.y -= 1.8 * dt;
+    // Yaw rotation from Q / E or mobile yaw
+    if (this.keyQ || this.mobileYaw < -0.1) this.rotation.y += 1.8 * dt * (this.mobileYaw < -0.1 ? -this.mobileYaw : 1);
+    if (this.keyE || this.mobileYaw > 0.1) this.rotation.y -= 1.8 * dt * (this.mobileYaw > 0.1 ? this.mobileYaw : 1);
 
     // Apply aerodynamic air friction / damping
     const airDrag = 0.94;

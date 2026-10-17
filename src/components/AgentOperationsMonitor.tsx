@@ -1,8 +1,12 @@
 'use client';
 
 import React, { useState } from 'react';
-import { Activity, ShieldCheck, Cpu, Palette, Compass, ChevronDown, ChevronUp } from 'lucide-react';
+import { Activity, ShieldCheck, Cpu, Palette, Compass, ChevronDown, ChevronUp, Bot, X } from 'lucide-react';
 import { AgentOperationStatus } from '../game/types';
+
+interface AgentOperationsMonitorProps {
+  isMobile?: boolean;
+}
 
 const INITIAL_AGENT_STATUSES: AgentOperationStatus[] = [
   {
@@ -43,12 +47,15 @@ const INITIAL_AGENT_STATUSES: AgentOperationStatus[] = [
   },
 ];
 
-export function AgentOperationsMonitor() {
+export function AgentOperationsMonitor({ isMobile = false }: AgentOperationsMonitorProps) {
   const [agents, setAgents] = useState<AgentOperationStatus[]>(INITIAL_AGENT_STATUSES);
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const [isMobileDrawerOpen, setIsMobileDrawerOpen] = useState(false);
 
-  return (
-    <div className="fixed right-4 bottom-4 z-20 w-80 sm:w-96 overflow-hidden rounded-2xl border border-cyan-500/30 bg-black/75 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+  const monitorContent = (
+    <div className={`overflow-hidden rounded-2xl border border-cyan-500/30 bg-black/85 backdrop-blur-xl shadow-[0_8px_32px_rgba(0,0,0,0.6)] ${
+      isMobile ? 'w-full max-w-md max-h-[80vh] flex flex-col' : 'fixed right-4 bottom-4 z-20 w-80 sm:w-96'
+    }`}>
       {/* Header Bar */}
       <div className="flex items-center justify-between border-b border-white/10 bg-cyan-950/40 px-3.5 py-2.5">
         <div className="flex items-center gap-2">
@@ -63,12 +70,21 @@ export function AgentOperationsMonitor() {
             <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-400"></span>
           </span>
           <span className="font-mono text-[10px] text-emerald-400 font-bold uppercase">LIVE</span>
-          <button
-            onClick={() => setIsCollapsed(!isCollapsed)}
-            className="text-zinc-400 hover:text-white p-0.5 rounded transition-colors"
-          >
-            {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
-          </button>
+          {isMobile ? (
+            <button
+              onClick={() => setIsMobileDrawerOpen(false)}
+              className="text-zinc-400 hover:text-white p-1 rounded-lg"
+            >
+              <X className="h-4 w-4" />
+            </button>
+          ) : (
+            <button
+              onClick={() => setIsCollapsed(!isCollapsed)}
+              className="text-zinc-400 hover:text-white p-0.5 rounded transition-colors"
+            >
+              {isCollapsed ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}
+            </button>
+          )}
         </div>
       </div>
 
@@ -108,7 +124,7 @@ export function AgentOperationsMonitor() {
           <div className="flex items-center justify-between text-[10px] text-zinc-400 border-t border-white/5 pt-2 px-1">
             <span className="flex items-center gap-1.5">
               <ShieldCheck className="h-3.5 w-3.5 text-cyan-400" />
-              <span>Three-Agent Nexus Protocol: Synced</span>
+              <span>Multi-Agent System Protocol</span>
             </span>
             <span className="text-cyan-300 font-bold">100% OPERATIONAL</span>
           </div>
@@ -116,4 +132,30 @@ export function AgentOperationsMonitor() {
       )}
     </div>
   );
+
+  if (isMobile) {
+    return (
+      <>
+        {/* Compact Mobile Pill Trigger */}
+        <div className="fixed top-4 right-16 z-20">
+          <button
+            onClick={() => setIsMobileDrawerOpen(true)}
+            className="flex items-center gap-1.5 rounded-xl border border-cyan-500/40 bg-black/75 px-2.5 py-2 text-[11px] font-mono font-bold text-cyan-300 backdrop-blur-md shadow-lg"
+          >
+            <Bot className="h-3.5 w-3.5 text-cyan-400 animate-pulse" />
+            <span>AGENTS (4)</span>
+          </button>
+        </div>
+
+        {/* Modal Drawer when opened on mobile */}
+        {isMobileDrawerOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+            {monitorContent}
+          </div>
+        )}
+      </>
+    );
+  }
+
+  return monitorContent;
 }

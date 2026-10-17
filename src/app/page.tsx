@@ -10,11 +10,26 @@ import { KeybindsModal } from '../components/KeybindsModal';
 import { NPCDialogueModal } from '../components/NPCDialogueModal';
 import { AgentOperationsMonitor } from '../components/AgentOperationsMonitor';
 import { DroneHUD } from '../components/DroneHUD';
+import { MobileTouchControls } from '../components/MobileTouchControls';
 import { Plane, Zap } from 'lucide-react';
 
 export default function ExplorationGamePage() {
   const containerRef = useRef<HTMLDivElement>(null);
   const engineRef = useRef<ThreeEngine | null>(null);
+
+  // Responsive Mobile Detection
+  const [isMobile, setIsMobile] = useState(false);
+  const [isMobileElevatorOpen, setIsMobileElevatorOpen] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      const mobile = window.innerWidth < 768 || ('ontouchstart' in window && window.innerWidth < 1024);
+      setIsMobile(mobile);
+    };
+    checkMobile();
+    window.addEventListener('resize', checkMobile);
+    return () => window.removeEventListener('resize', checkMobile);
+  }, []);
 
   const [telemetry, setTelemetry] = useState<PlayerTelemetry | null>(null);
   const [nearNPC, setNearNPC] = useState<NPCData | null>(null);
@@ -211,6 +226,7 @@ export default function ExplorationGamePage() {
         <DroneHUD
           telemetry={droneTelemetry}
           onExitDrone={handleExitDroneFlight}
+          isMobile={isMobile}
         />
       ) : (
         /* STANDARD CHARACTER EXPLORATION MODE */
@@ -224,10 +240,11 @@ export default function ExplorationGamePage() {
             }}
             onOpenHelp={() => setIsHelpOpen(true)}
             onOpenComms={() => setIsCommsOpen(true)}
+            isMobile={isMobile}
           />
 
-          {/* Helipad Drone Launch Button (Visible on Rooftop) */}
-          {telemetry && telemetry.position.y >= 28 && (
+          {/* Desktop Helipad Drone Launch Button (Visible on Rooftop) */}
+          {!isMobile && telemetry && telemetry.position.y >= 28 && (
             <div className="fixed left-4 bottom-80 z-30 animate-pulse">
               <button
                 onClick={handleStartDroneFlight}
@@ -252,6 +269,9 @@ export default function ExplorationGamePage() {
             currentFloor={telemetry?.currentFloor ?? 1}
             onSelectFloor={handleSelectFloor}
             onSelectRooftop={handleSelectRooftop}
+            isMobile={isMobile}
+            isOpen={isMobile ? isMobileElevatorOpen : true}
+            onClose={() => setIsMobileElevatorOpen(false)}
           />
 
           {/* Agent Comms Transceiver Terminal */}
@@ -276,8 +296,61 @@ export default function ExplorationGamePage() {
         </>
       )}
 
-      {/* Permanent On-Screen Agent Operations Monitor */}
-      <AgentOperationsMonitor />
+      {/* MOBILE CIRCLE BUTTON PAD & TOUCH CONTROLS */}
+      {isMobile && (
+        <MobileTouchControls
+          isDroneFlight={isDroneFlight}
+          nearNPC={nearNPC}
+          onHelipad={!!(telemetry && telemetry.position.y >= 28)}
+          onMove={(x, y) => {
+            if (isDroneFlight) {
+              engineRef.current?.drone.setJoystick(x, y);
+            } else {
+              engineRef.current?.controls.setJoystick(x, y);
+            }
+          }}
+          onLook={(dx, dy) => {
+            if (isDroneFlight) {
+              engineRef.current?.drone.applyLookDelta(dx, dy);
+            } else {
+              engineRef.current?.controls.applyLookDelta(dx, dy);
+            }
+          }}
+          onJump={() => {
+            engineRef.current?.controls.triggerJump();
+          }}
+          onSprintToggle={(sprint) => {
+            engineRef.current?.controls.setMobileSprint(sprint);
+          }}
+          onInteractNPC={() => {
+            if (nearNPCRef.current) setActiveNPC(nearNPCRef.current);
+          }}
+          onLaunchDrone={() => {
+            handleStartDroneFlight();
+          }}
+          onOpenElevator={() => {
+            setIsMobileElevatorOpen(true);
+          }}
+          onDroneAscend={(ascend) => {
+            engineRef.current?.drone.setAltitude(ascend, false);
+          }}
+          onDroneDescend={(descend) => {
+            engineRef.current?.drone.setAltitude(false, descend);
+          }}
+          onDroneTurbo={(turbo) => {
+            engineRef.current?.drone.setTurbo(turbo);
+          }}
+          onDroneYaw={(dir) => {
+            engineRef.current?.drone.setYaw(dir);
+          }}
+          onDroneExit={() => {
+            handleExitDroneFlight();
+          }}
+        />
+      )}
+
+      {/* On-Screen Agent Operations Monitor (Desktop floating panel or mobile pill drawer) */}
+      <AgentOperationsMonitor isMobile={isMobile} />
     </main>
   );
 }

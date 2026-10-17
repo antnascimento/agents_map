@@ -32,6 +32,10 @@ export class ExplorationControls {
   private wallBounds: THREE.Box3[] = [];
   private raycaster: THREE.Raycaster;
 
+  // Mobile virtual joystick & button states
+  public joystickVector: THREE.Vector2 = new THREE.Vector2(0, 0);
+  public mobileSprint: boolean = false;
+
   // Telemetry callback
   public onTelemetry?: (telemetry: PlayerTelemetry) => void;
 
@@ -55,13 +59,46 @@ export class ExplorationControls {
     this.wallBounds = walls;
   }
 
+  public setJoystick(x: number, y: number) {
+    this.joystickVector.set(x, y);
+  }
+
+  public setMobileSprint(sprint: boolean) {
+    this.mobileSprint = sprint;
+  }
+
+  public triggerJump() {
+    if (this.isGrounded) {
+      this.velocity.y = 5.8;
+      this.isGrounded = false;
+    }
+  }
+
+  public applyLookDelta(deltaX: number, deltaY: number) {
+    const sensitivity = 0.0035;
+    this.euler.setFromQuaternion(this.camera.quaternion);
+    this.euler.y -= deltaX * sensitivity;
+    this.euler.x -= deltaY * sensitivity;
+
+    const maxPitch = (85 * Math.PI) / 180;
+    this.euler.x = Math.max(-maxPitch, Math.min(maxPitch, this.euler.x));
+
+    this.camera.quaternion.setFromEuler(this.euler);
+  }
+
   private bindEvents() {
     window.addEventListener('keydown', this.onKeyDown);
     window.addEventListener('keyup', this.onKeyUp);
 
-    // PointerLock handlers
+    // PointerLock handlers (desktop only)
     this.domElement.addEventListener('click', () => {
-      this.domElement.requestPointerLock?.();
+      if ('ontouchstart' in window || navigator.maxTouchPoints > 0) return;
+      try {
+        const promise = this.domElement.requestPointerLock?.();
+        if (promise && typeof (promise as any).catch === 'function') {
+          (promise as any).catch(() => {});
+        }
+      } catch (_) {}
     });
 
     document.addEventListener('pointerlockchange', () => {
@@ -207,7 +244,8 @@ export class ExplorationControls {
     const dt = Math.min(delta, 0.1);
 
     // Movement speeds
-    const baseSpeed = this.isCrouching ? 2.5 : this.isSprinting ? 8.5 : 4.8;
+    const effectiveSprint = this.isSprinting || this.mobileSprint;
+    const baseSpeed = this.isCrouching ? 2.5 : effectiveSprint ? 8.5 : 4.8;
     const targetEyeHeight = this.isCrouching ? 1.0 : 1.7;
 
     // Direction vector relative to camera heading
@@ -219,6 +257,12 @@ export class ExplorationControls {
     if (this.moveBackward) direction.sub(forward);
     if (this.moveRight) direction.add(right);
     if (this.moveLeft) direction.sub(right);
+
+    // Apply mobile virtual joystick input (x = strafe, y = forward/back)
+    if (this.joystickVector.lengthSq() > 0.001) {
+      direction.addScaledVector(forward, this.joystickVector.y);
+      direction.addScaledVector(right, this.joystickVector.x);
+    }
 
     if (direction.lengthSq() > 0) {
       direction.normalize();
